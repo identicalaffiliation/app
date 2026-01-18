@@ -14,6 +14,10 @@ func NewPostgres() *Postgres {
 	return &Postgres{}
 }
 
+func (p *Postgres) Close() error {
+	return p.db.Close()
+}
+
 func (p *Postgres) MustInitDB(cfg *config.AppConfig) {
 	db, err := connect.ConnectToDB(cfg)
 	if err != nil {
