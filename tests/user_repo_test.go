@@ -426,3 +426,66 @@ func TestChangePassword(t *testing.T) {
 		})
 	}
 }
+
+func TestDelete(t *testing.T) {
+	type testCase struct {
+		testName      string
+		mockSetup     func(mock sqlmock.Sqlmock, id uuid.UUID)
+		inputID       uuid.UUID
+		ExpectedError error
+	}
+
+	testTime := time.Now()
+	validID := uuid.New()
+	invalidID := uuid.New()
+
+	testCases := []testCase{
+		{
+			testName: "success – user deleted",
+			mockSetup: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+				query := `DELETE FROM users WHERE id = \$1`
+
+				_ = sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
+					AddRow(id, "vlad", "123@mail.ru", "123", testTime, testTime)
+
+				mock.ExpectExec(query).WithArgs(id).WillReturnResult(sqlmock.NewResult(0, 1))
+			},
+			inputID:       validID,
+			ExpectedError: nil,
+		},
+
+		{
+			testName: "error – invalid id",
+			mockSetup: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+				query := `DELETE FROM users WHERE id = \$1`
+
+				mock.ExpectExec(query).WithArgs(id).WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			inputID:       invalidID,
+			ExpectedError: psql.ErrInvalidUserID,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testName, func(t *testing.T) {
+			db, mock, err := sqlmock.New()
+			require.NoError(t, err)
+			defer db.Close()
+
+			repo := Init(db)
+
+			if testCase.ExpectedError != nil {
+				testCase.mockSetup(mock, testCase.inputID)
+				err := repo.Delete(context.Background(), testCase.inputID)
+				require.Error(t, err)
+				assert.Equal(t, testCase.ExpectedError, err)
+				require.NoError(t, mock.ExpectationsWereMet())
+			} else {
+				testCase.mockSetup(mock, testCase.inputID)
+				err := repo.Delete(context.Background(), testCase.inputID)
+				require.NoError(t, err)
+				require.NoError(t, mock.ExpectationsWereMet())
+			}
+		})
+	}
+}

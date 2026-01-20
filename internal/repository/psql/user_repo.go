@@ -17,7 +17,7 @@ type UserRepository interface {
 	ChangeName(ctx context.Context, newName string, userID uuid.UUID) error
 	ChangeEmail(ctx context.Context, newEmail string, userID uuid.UUID) error
 	ChangePassword(ctx context.Context, newPassword string, userID uuid.UUID) error
-	// Delete(ctx context.Context, userID uuid.UUID) error
+	Delete(ctx context.Context, userID uuid.UUID) error
 }
 
 type userRepository struct {
@@ -94,7 +94,7 @@ func (ur *userRepository) ChangeName(ctx context.Context, newName string, userID
 
 	affected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("get affected: %w", err)
+		return ErrGetAffected
 	}
 
 	if affected == 0 {
@@ -118,7 +118,7 @@ func (ur *userRepository) ChangeEmail(ctx context.Context, newEmail string, user
 
 	affected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("get affected: %w", err)
+		return ErrGetAffected
 	}
 
 	if affected == 0 {
@@ -142,7 +142,31 @@ func (ur *userRepository) ChangePassword(ctx context.Context, newPassword string
 
 	affected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("get affected: %w", err)
+		return ErrGetAffected
+	}
+
+	if affected == 0 {
+		return ErrInvalidUserID
+	}
+
+	return nil
+}
+
+func (ur *userRepository) Delete(ctx context.Context, userID uuid.UUID) error {
+	sql, args, err := ur.qb.Builder.Delete("users").
+		Where(squirrel.Eq{"id": userID}).ToSql()
+	if err != nil {
+		return ErrFailBuildQuery
+	}
+
+	result, err := ur.db.DB.ExecContext(ctx, sql, args...)
+	if err != nil {
+		return fmt.Errorf("delete user: %w", err)
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return ErrGetAffected
 	}
 
 	if affected == 0 {
