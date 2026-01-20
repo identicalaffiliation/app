@@ -68,6 +68,7 @@ func TestCreateUser(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
 			db, mock, err := sqlmock.New()
 			require.NoError(t, err)
 			defer db.Close()
@@ -131,6 +132,7 @@ func TestGetAllUsers(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
 			db, mock, err := sqlmock.New()
 			require.NoError(t, err)
 			defer db.Close()
@@ -198,6 +200,7 @@ func TestGetByID(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
 			db, mock, err := sqlmock.New()
 			require.NoError(t, err)
 			defer db.Close()
@@ -270,6 +273,7 @@ func TestChangeName(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
 			db, mock, err := sqlmock.New()
 			require.NoError(t, err)
 			defer db.Close()
@@ -337,6 +341,7 @@ func TestChangeEmail(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
 			db, mock, err := sqlmock.New()
 			require.NoError(t, err)
 			defer db.Close()
@@ -404,6 +409,7 @@ func TestChangePassword(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
 			db, mock, err := sqlmock.New()
 			require.NoError(t, err)
 			defer db.Close()
@@ -468,6 +474,7 @@ func TestDelete(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
 			db, mock, err := sqlmock.New()
 			require.NoError(t, err)
 			defer db.Close()
