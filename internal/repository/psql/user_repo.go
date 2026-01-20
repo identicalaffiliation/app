@@ -15,8 +15,8 @@ type UserRepository interface {
 	GetByID(ctx context.Context, userID uuid.UUID) (*entity.User, error)
 	GetAllUsers(ctx context.Context) ([]*entity.User, error)
 	ChangeName(ctx context.Context, newName string, userID uuid.UUID) error
-	// ChangeEmail(ctx context.Context, newEmail string, userID uuid.UUID) error
-	// ChangePassword(ctx context.Context, newPassword string, userID uuid.UUID) error
+	ChangeEmail(ctx context.Context, newEmail string, userID uuid.UUID) error
+	ChangePassword(ctx context.Context, newPassword string, userID uuid.UUID) error
 	// Delete(ctx context.Context, userID uuid.UUID) error
 }
 
@@ -90,6 +90,54 @@ func (ur *userRepository) ChangeName(ctx context.Context, newName string, userID
 	result, err := ur.db.DB.ExecContext(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("update name: %w", err)
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("get affected: %w", err)
+	}
+
+	if affected == 0 {
+		return ErrInvalidUserID
+	}
+
+	return nil
+}
+
+func (ur *userRepository) ChangeEmail(ctx context.Context, newEmail string, userID uuid.UUID) error {
+	sql, args, err := ur.qb.Builder.Update("users").Set("email", newEmail).
+		Where(squirrel.Eq{"id": userID}).ToSql()
+	if err != nil {
+		return ErrFailBuildQuery
+	}
+
+	result, err := ur.db.DB.ExecContext(ctx, sql, args...)
+	if err != nil {
+		return fmt.Errorf("update email: %w", err)
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("get affected: %w", err)
+	}
+
+	if affected == 0 {
+		return ErrInvalidUserID
+	}
+
+	return nil
+}
+
+func (ur *userRepository) ChangePassword(ctx context.Context, newPassword string, userID uuid.UUID) error {
+	sql, args, err := ur.qb.Builder.Update("users").Set("password", newPassword).
+		Where(squirrel.Eq{"id": userID}).ToSql()
+	if err != nil {
+		return ErrFailBuildQuery
+	}
+
+	result, err := ur.db.DB.ExecContext(ctx, sql, args...)
+	if err != nil {
+		return fmt.Errorf("update password: %w", err)
 	}
 
 	affected, err := result.RowsAffected()
