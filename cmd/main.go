@@ -15,6 +15,11 @@ func main() {
 	logger := logger.NewLogger()
 
 	db := psql.NewPostgres()
+	defer db.Close()
+
 	queryBuilder := psql.NewQueryBuilder()
+
 	db.MustInitDB(cfg)
+
+	_ = psql.NewUserRepository(db, queryBuilder, logger)
 }

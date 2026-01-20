@@ -7,7 +7,7 @@ import (
 )
 
 type Postgres struct {
-	db *sqlx.DB
+	DB *sqlx.DB
 }
 
 func NewPostgres() *Postgres {
@@ -15,7 +15,7 @@ func NewPostgres() *Postgres {
 }
 
 func (p *Postgres) Close() error {
-	return p.db.Close()
+	return p.DB.Close()
 }
 
 func (p *Postgres) MustInitDB(cfg *config.AppConfig) {
@@ -24,5 +24,5 @@ func (p *Postgres) MustInitDB(cfg *config.AppConfig) {
 		panic(err)
 	}
 
-	p.db = db
+	p.DB = db
 }
