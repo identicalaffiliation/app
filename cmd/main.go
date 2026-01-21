@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	path := parse.FlagInitUser()
+	path := parse.FlagInit()
 
 	cfg := config.MustLoadConfig(path)
 
@@ -19,7 +19,7 @@ func main() {
 
 	queryBuilder := psql.NewQueryBuilder()
 
-	db.MustInitUserDB(cfg)
+	db.MustInit(cfg)
 
 	_ = psql.NewUserRepository(db, queryBuilder, logger)
 }

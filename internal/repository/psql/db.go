@@ -18,7 +18,7 @@ func (p *Postgres) Close() error {
 	return p.DB.Close()
 }
 
-func (p *Postgres) MustInitUserDB(cfg *config.AppConfig) {
+func (p *Postgres) MustInit(cfg *config.AppConfig) {
 	db, err := connect.ConnectToDB(cfg)
 	if err != nil {
 		panic(err)
