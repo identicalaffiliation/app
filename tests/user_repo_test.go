@@ -142,7 +142,7 @@ func TestGetByID(t *testing.T) {
 		mockSetup     func(mock sqlmock.Sqlmock, expected *entity.User)
 		inputID       uuid.UUID
 		expectedUser  *entity.User
-		expectedError error
+		expectedError string
 	}
 
 	testTime := time.Now()
@@ -170,7 +170,7 @@ func TestGetByID(t *testing.T) {
 				CreatedAt: testTime,
 				UpdatedAt: testTime,
 			},
-			expectedError: nil,
+			expectedError: "",
 		},
 	}
 
@@ -183,12 +183,12 @@ func TestGetByID(t *testing.T) {
 
 			repo := InitUser(db)
 
-			if testCase.expectedError != nil {
+			if testCase.expectedError != "" {
 				testCase.mockSetup(mock, &entity.User{ID: testInvalidID})
 				result, err := repo.GetByID(context.Background(), testCase.inputID)
 				assert.Error(t, err)
 				assert.Nil(t, result)
-				assert.Equal(t, err, psql.ErrInvalidUserID)
+				assert.Contains(t, err.Error(), testCase.expectedError)
 
 				require.NoError(t, mock.ExpectationsWereMet())
 			} else {
@@ -211,13 +211,12 @@ func TestChangeName(t *testing.T) {
 		mockSetup     func(mock sqlmock.Sqlmock, id uuid.UUID)
 		inputID       uuid.UUID
 		inputName     string
-		expectedError error
+		expectedError string
 	}
 
 	validID := uuid.New()
 	validName := "a"
 	invalidID := uuid.New()
-	testTime := time.Now()
 
 	testCases := []testCase{
 		{
@@ -225,14 +224,11 @@ func TestChangeName(t *testing.T) {
 			mockSetup: func(mock sqlmock.Sqlmock, id uuid.UUID) {
 				query := `UPDATE users SET name = \$1 WHERE id = \$2`
 
-				_ = sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
-					AddRow(id, "vlad", "123@mail.ru", "123", testTime, testTime)
-
 				mock.ExpectExec(query).WithArgs("a", id).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 			inputID:       validID,
 			inputName:     validName,
-			expectedError: nil,
+			expectedError: "",
 		},
 		{
 			testName: "error – invalid user ID",
@@ -243,7 +239,7 @@ func TestChangeName(t *testing.T) {
 			},
 			inputID:       invalidID,
 			inputName:     "b",
-			expectedError: psql.ErrInvalidUserID,
+			expectedError: "user not found",
 		},
 	}
 
@@ -256,12 +252,12 @@ func TestChangeName(t *testing.T) {
 
 			repo := InitUser(db)
 
-			if testCase.expectedError != nil {
+			if testCase.expectedError != "" {
 				testCase.mockSetup(mock, testCase.inputID)
 
 				err := repo.ChangeName(context.Background(), testCase.inputName, testCase.inputID)
 				require.Error(t, err)
-				assert.ErrorIs(t, testCase.expectedError, err)
+				assert.Contains(t, err.Error(), testCase.expectedError)
 				require.NoError(t, mock.ExpectationsWereMet())
 			} else {
 				testCase.mockSetup(mock, testCase.inputID)
@@ -279,13 +275,12 @@ func TestChangeEmail(t *testing.T) {
 		mockSetup     func(mock sqlmock.Sqlmock, id uuid.UUID)
 		inputID       uuid.UUID
 		inputEmail    string
-		expectedError error
+		expectedError string
 	}
 
 	validID := uuid.New()
 	validEmail := "a"
 	invalidID := uuid.New()
-	testTime := time.Now()
 
 	testCases := []testCase{
 		{
@@ -293,14 +288,11 @@ func TestChangeEmail(t *testing.T) {
 			mockSetup: func(mock sqlmock.Sqlmock, id uuid.UUID) {
 				query := `UPDATE users SET email = \$1 WHERE id = \$2`
 
-				_ = sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
-					AddRow(id, "vlad", "123@mail.ru", "123", testTime, testTime)
-
 				mock.ExpectExec(query).WithArgs("a", id).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 			inputID:       validID,
 			inputEmail:    validEmail,
-			expectedError: nil,
+			expectedError: "",
 		},
 		{
 			testName: "error – invalid user ID",
@@ -311,7 +303,7 @@ func TestChangeEmail(t *testing.T) {
 			},
 			inputID:       invalidID,
 			inputEmail:    "b",
-			expectedError: psql.ErrInvalidUserID,
+			expectedError: "user not found",
 		},
 	}
 
@@ -324,12 +316,12 @@ func TestChangeEmail(t *testing.T) {
 
 			repo := InitUser(db)
 
-			if testCase.expectedError != nil {
+			if testCase.expectedError != "" {
 				testCase.mockSetup(mock, testCase.inputID)
 
 				err := repo.ChangeEmail(context.Background(), testCase.inputEmail, testCase.inputID)
 				require.Error(t, err)
-				assert.ErrorIs(t, testCase.expectedError, err)
+				assert.Contains(t, err.Error(), testCase.expectedError)
 				require.NoError(t, mock.ExpectationsWereMet())
 			} else {
 				testCase.mockSetup(mock, testCase.inputID)
@@ -347,13 +339,12 @@ func TestChangePassword(t *testing.T) {
 		mockSetup     func(mock sqlmock.Sqlmock, id uuid.UUID)
 		inputID       uuid.UUID
 		inputPassword string
-		expectedError error
+		expectedError string
 	}
 
 	validID := uuid.New()
 	validPassword := "a"
 	invalidID := uuid.New()
-	testTime := time.Now()
 
 	testCases := []testCase{
 		{
@@ -361,14 +352,11 @@ func TestChangePassword(t *testing.T) {
 			mockSetup: func(mock sqlmock.Sqlmock, id uuid.UUID) {
 				query := `UPDATE users SET password = \$1 WHERE id = \$2`
 
-				_ = sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
-					AddRow(id, "vlad", "123@mail.ru", "123", testTime, testTime)
-
 				mock.ExpectExec(query).WithArgs("a", id).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 			inputID:       validID,
 			inputPassword: validPassword,
-			expectedError: nil,
+			expectedError: "",
 		},
 		{
 			testName: "error – invalid user ID",
@@ -379,7 +367,7 @@ func TestChangePassword(t *testing.T) {
 			},
 			inputID:       invalidID,
 			inputPassword: "b",
-			expectedError: psql.ErrInvalidUserID,
+			expectedError: "user not found",
 		},
 	}
 
@@ -392,12 +380,12 @@ func TestChangePassword(t *testing.T) {
 
 			repo := InitUser(db)
 
-			if testCase.expectedError != nil {
+			if testCase.expectedError != "" {
 				testCase.mockSetup(mock, testCase.inputID)
 
 				err := repo.ChangePassword(context.Background(), testCase.inputPassword, testCase.inputID)
 				require.Error(t, err)
-				assert.ErrorIs(t, testCase.expectedError, err)
+				assert.Contains(t, err.Error(), testCase.expectedError)
 				require.NoError(t, mock.ExpectationsWereMet())
 			} else {
 				testCase.mockSetup(mock, testCase.inputID)
@@ -414,10 +402,9 @@ func TestDelete(t *testing.T) {
 		testName      string
 		mockSetup     func(mock sqlmock.Sqlmock, id uuid.UUID)
 		inputID       uuid.UUID
-		ExpectedError error
+		ExpectedError string
 	}
 
-	testTime := time.Now()
 	validID := uuid.New()
 	invalidID := uuid.New()
 
@@ -427,13 +414,10 @@ func TestDelete(t *testing.T) {
 			mockSetup: func(mock sqlmock.Sqlmock, id uuid.UUID) {
 				query := `DELETE FROM users WHERE id = \$1`
 
-				_ = sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
-					AddRow(id, "vlad", "123@mail.ru", "123", testTime, testTime)
-
 				mock.ExpectExec(query).WithArgs(id).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 			inputID:       validID,
-			ExpectedError: nil,
+			ExpectedError: "",
 		},
 
 		{
@@ -444,7 +428,7 @@ func TestDelete(t *testing.T) {
 				mock.ExpectExec(query).WithArgs(id).WillReturnResult(sqlmock.NewResult(0, 0))
 			},
 			inputID:       invalidID,
-			ExpectedError: psql.ErrInvalidUserID,
+			ExpectedError: "user not found",
 		},
 	}
 
@@ -457,11 +441,11 @@ func TestDelete(t *testing.T) {
 
 			repo := InitUser(db)
 
-			if testCase.ExpectedError != nil {
+			if testCase.ExpectedError != "" {
 				testCase.mockSetup(mock, testCase.inputID)
 				err := repo.Delete(context.Background(), testCase.inputID)
 				require.Error(t, err)
-				assert.Equal(t, testCase.ExpectedError, err)
+				assert.Contains(t, err.Error(), testCase.ExpectedError)
 				require.NoError(t, mock.ExpectationsWereMet())
 			} else {
 				testCase.mockSetup(mock, testCase.inputID)

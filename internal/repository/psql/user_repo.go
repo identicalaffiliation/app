@@ -143,7 +143,7 @@ func (ur *userRepository) ChangeName(ctx context.Context, newName string, userID
 	affected, err := result.RowsAffected()
 	if err != nil {
 		ur.logger.Logger.Error("failed to get affected from update name",
-			"operation", "update  name",
+			"operation", "update name",
 			"user_id", userID.String(),
 			"req_name", newName,
 			"error", err.Error(),
