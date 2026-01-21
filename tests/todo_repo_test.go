@@ -274,3 +274,133 @@ func TestUpdateStatus(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateContent(t *testing.T) {
+	type testCase struct {
+		testName      string
+		mockSetup     func(mock sqlmock.Sqlmock, userID, todoID uuid.UUID, content string)
+		userID        uuid.UUID
+		todoID        uuid.UUID
+		content       string
+		expectedError string
+	}
+
+	todoID := uuid.New()
+	userID := uuid.New()
+	content := "breakfast"
+	e := errors.New("todo not found").Error()
+
+	testTable := []testCase{
+		{
+			testName: "success – todo updated",
+			mockSetup: func(mock sqlmock.Sqlmock, userID, todoID uuid.UUID, content string) {
+
+				mock.ExpectExec(regexp.QuoteMeta(TODO_UPDATE_CONTENT)).WithArgs(content, todoID, userID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+			},
+			userID:        userID,
+			todoID:        todoID,
+			content:       content,
+			expectedError: "",
+		},
+		{
+			testName: "error – todo not found",
+			mockSetup: func(mock sqlmock.Sqlmock, userID, todoID uuid.UUID, content string) {
+				mock.ExpectExec(regexp.QuoteMeta(TODO_UPDATE_CONTENT)).WithArgs(content, todoID, userID).WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			userID:        userID,
+			todoID:        todoID,
+			content:       content,
+			expectedError: e,
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
+
+			db, mock, err := sqlmock.New()
+			require.NoError(t, err)
+			defer db.Close()
+			repo := InitTodo(db)
+
+			if testCase.expectedError != "" {
+				testCase.mockSetup(mock, testCase.userID, testCase.todoID, testCase.content)
+				err := repo.UpdateContent(context.Background(), testCase.content, testCase.todoID, testCase.userID)
+				require.Error(t, err)
+				assert.Equal(t, err.Error(), testCase.expectedError)
+
+				require.NoError(t, mock.ExpectationsWereMet())
+			} else {
+				testCase.mockSetup(mock, testCase.userID, testCase.todoID, testCase.content)
+				err := repo.UpdateContent(context.Background(), testCase.content, testCase.todoID, testCase.userID)
+				require.NoError(t, err)
+
+				require.NoError(t, mock.ExpectationsWereMet())
+			}
+		})
+	}
+}
+
+func TestDeleteTodo(t *testing.T) {
+	type testCase struct {
+		testName      string
+		mockSetup     func(mock sqlmock.Sqlmock, userID, todoID uuid.UUID)
+		userID        uuid.UUID
+		todoID        uuid.UUID
+		expectedError string
+	}
+
+	todoID := uuid.New()
+	userID := uuid.New()
+	e := errors.New("todo not found").Error()
+
+	testTable := []testCase{
+		{
+			testName: "success – todo deleted",
+			mockSetup: func(mock sqlmock.Sqlmock, userID, todoID uuid.UUID) {
+
+				mock.ExpectExec(regexp.QuoteMeta(TODO_DELETE)).WithArgs(todoID, userID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+			},
+			userID:        userID,
+			todoID:        todoID,
+			expectedError: "",
+		},
+		{
+			testName: "error – todo not found",
+			mockSetup: func(mock sqlmock.Sqlmock, userID, todoID uuid.UUID) {
+				mock.ExpectExec(regexp.QuoteMeta(TODO_DELETE)).WithArgs(todoID, userID).WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			userID:        userID,
+			todoID:        todoID,
+			expectedError: e,
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.testName, func(t *testing.T) {
+			t.Parallel()
+
+			db, mock, err := sqlmock.New()
+			require.NoError(t, err)
+			defer db.Close()
+			repo := InitTodo(db)
+
+			if testCase.expectedError != "" {
+				testCase.mockSetup(mock, testCase.userID, testCase.todoID)
+				err := repo.Delete(context.Background(), testCase.todoID, testCase.userID)
+				require.Error(t, err)
+				assert.Equal(t, err.Error(), testCase.expectedError)
+
+				require.NoError(t, mock.ExpectationsWereMet())
+			} else {
+				testCase.mockSetup(mock, testCase.userID, testCase.todoID)
+				err := repo.Delete(context.Background(), testCase.todoID, testCase.userID)
+				require.NoError(t, err)
+
+				require.NoError(t, mock.ExpectationsWereMet())
+			}
+		})
+	}
+}

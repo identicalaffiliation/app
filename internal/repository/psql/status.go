@@ -1,9 +1,9 @@
 package psql
 
-type NoteStatus string
+type TodoStatus string
 
 const (
-	Todo      NoteStatus = "todo"
-	Processed NoteStatus = "processed"
-	Done      NoteStatus = "done"
+	Todo      TodoStatus = "todo"
+	Processed TodoStatus = "processed"
+	Done      TodoStatus = "done"
 )

@@ -10,14 +10,14 @@ type Logger struct {
 }
 
 func NewLogger() *Logger {
-	h := initLogger()
+	h := InitUserLogger()
 
 	return &Logger{
 		logger: slog.New(h),
 	}
 }
 
-func initLogger() *slog.JSONHandler {
+func InitUserLogger() *slog.JSONHandler {
 	opts := &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}

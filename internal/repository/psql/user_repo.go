@@ -74,7 +74,7 @@ func (ur *userRepository) GetByID(ctx context.Context, userID uuid.UUID) (*entit
 
 	var user entity.User
 	if err := ur.db.DB.GetContext(ctx, &user, sql, args...); err != nil {
-		return nil, ErrInvalidUserID
+		return nil, fmt.Errorf("select user: %w", err)
 	}
 
 	return &user, nil
