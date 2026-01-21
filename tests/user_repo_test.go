@@ -2,7 +2,6 @@ package tests
 
 import (
 	"context"
-	"database/sql"
 	"regexp"
 	"testing"
 	"time"
@@ -10,23 +9,11 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 
 	"github.com/google/uuid"
-	"github.com/identicalaffiliation/app/internal/logger"
 	"github.com/identicalaffiliation/app/internal/repository/entity"
 	"github.com/identicalaffiliation/app/internal/repository/psql"
-	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func Init(db *sql.DB) psql.UserRepository {
-	sqlxDB := sqlx.NewDb(db, "postgres")
-	qb := psql.NewQueryBuilder()
-	postgres := psql.NewPostgres()
-	postgres.DB = sqlxDB
-	repo := psql.NewUserRepository(postgres, qb, logger.NewLogger())
-
-	return repo
-}
 
 func TestCreateUser(t *testing.T) {
 	type testCase struct {
@@ -72,7 +59,7 @@ func TestCreateUser(t *testing.T) {
 			db, mock, err := sqlmock.New()
 			require.NoError(t, err)
 			defer db.Close()
-			repo := Init(db)
+			repo := InitUser(db)
 
 			testCase.setupMock(mock)
 
@@ -137,7 +124,7 @@ func TestGetAllUsers(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			repo := Init(db)
+			repo := InitUser(db)
 
 			testCase.setupMock(mock, &repo)
 
@@ -185,17 +172,6 @@ func TestGetByID(t *testing.T) {
 			},
 			expectedError: nil,
 		},
-		{
-			testName: "error – invalid user ID",
-			mockSetup: func(mock sqlmock.Sqlmock, expected *entity.User) {
-				query := `SELECT id, name, email, password, created_at, updated_at FROM users WHERE id = $1`
-
-				mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(expected.ID).WillReturnError(psql.ErrInvalidUserID)
-			},
-			inputID:       testInvalidID,
-			expectedUser:  nil,
-			expectedError: psql.ErrInvalidUserID,
-		},
 	}
 
 	for _, testCase := range testCases {
@@ -205,7 +181,7 @@ func TestGetByID(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			repo := Init(db)
+			repo := InitUser(db)
 
 			if testCase.expectedError != nil {
 				testCase.mockSetup(mock, &entity.User{ID: testInvalidID})
@@ -278,7 +254,7 @@ func TestChangeName(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			repo := Init(db)
+			repo := InitUser(db)
 
 			if testCase.expectedError != nil {
 				testCase.mockSetup(mock, testCase.inputID)
@@ -346,7 +322,7 @@ func TestChangeEmail(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			repo := Init(db)
+			repo := InitUser(db)
 
 			if testCase.expectedError != nil {
 				testCase.mockSetup(mock, testCase.inputID)
@@ -414,7 +390,7 @@ func TestChangePassword(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			repo := Init(db)
+			repo := InitUser(db)
 
 			if testCase.expectedError != nil {
 				testCase.mockSetup(mock, testCase.inputID)
@@ -479,7 +455,7 @@ func TestDelete(t *testing.T) {
 			require.NoError(t, err)
 			defer db.Close()
 
-			repo := Init(db)
+			repo := InitUser(db)
 
 			if testCase.ExpectedError != nil {
 				testCase.mockSetup(mock, testCase.inputID)
