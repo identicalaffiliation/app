@@ -6,14 +6,14 @@ import (
 )
 
 type Logger struct {
-	logger *slog.Logger
+	Logger *slog.Logger
 }
 
 func NewLogger() *Logger {
 	h := InitLogger()
 
 	return &Logger{
-		logger: slog.New(h),
+		Logger: slog.New(h),
 	}
 }
 

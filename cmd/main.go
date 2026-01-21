@@ -22,4 +22,5 @@ func main() {
 	db.MustInit(cfg)
 
 	_ = psql.NewUserRepository(db, queryBuilder, logger)
+	_ = psql.NewTodoRepository(db, queryBuilder, logger)
 }
