@@ -17,10 +17,10 @@ func NewLogger() *Logger {
 	}
 }
 
-func InitLogger() *slog.JSONHandler {
+func InitLogger() *slog.TextHandler {
 	opts := &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}
 
-	return slog.NewJSONHandler(os.Stdout, opts)
+	return slog.NewTextHandler(os.Stdout, opts)
 }
