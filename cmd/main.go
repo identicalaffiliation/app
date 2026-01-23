@@ -18,7 +18,6 @@ func main() {
 	defer db.Close()
 
 	queryBuilder := psql.NewQueryBuilder()
-
 	db.MustInit(cfg)
 
 	_ = psql.NewUserRepository(db, queryBuilder, logger)

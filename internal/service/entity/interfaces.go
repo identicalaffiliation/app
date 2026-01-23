@@ -6,9 +6,7 @@ import (
 	"github.com/identicalaffiliation/app/internal/dto"
 )
 
-type UserUseCases interface {
-	CreateUser(ctx context.Context, userRequest *dto.UserCreateRequest) error
-	// ChangeName(ctx context.Context, changeRequest *dto.ChangeUserNameRequest) error
-	// ChangeEmail(ctx context.Context, changeRequest *dto.ChangeUserEmailRequest) error
-	// ChangePassword(ctx context.Context, changeRequest *dto.ChangeUserPasswordRequest) error
+type AuthUseCases interface {
+	Register(ctx context.Context, userRequest *dto.UserRegisterRequest) error
+	Login(ctx context.Context, userRequest *dto.UserLoginRequest) (*dto.AuthResponse, error)
 }

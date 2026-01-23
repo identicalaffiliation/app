@@ -17,6 +17,10 @@ func InitValidator() *Validator {
 	}
 }
 
-func (v *Validator) UserCreateValidate(user *dto.UserCreateRequest) error {
+func (v *Validator) UserRegisterRequestValidate(user *dto.UserRegisterRequest) error {
+	return v.Validator.Struct(user)
+}
+
+func (v *Validator) UserLoginRequestValidate(user *dto.UserLoginRequest) error {
 	return v.Validator.Struct(user)
 }
