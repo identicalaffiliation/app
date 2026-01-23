@@ -14,6 +14,7 @@ import (
 type UserRepository interface {
 	Create(ctx context.Context, user *entity.User) error
 	GetByID(ctx context.Context, userID uuid.UUID) (*entity.User, error)
+	GetByEmail(ctx context.Context, userEmail string) (*entity.User, error)
 	GetAllUsers(ctx context.Context) ([]*entity.User, error)
 	ChangeName(ctx context.Context, newName string, userID uuid.UUID) error
 	ChangeEmail(ctx context.Context, newEmail string, userID uuid.UUID) error
@@ -105,6 +106,33 @@ func (ur *userRepository) GetByID(ctx context.Context, userID uuid.UUID) (*entit
 		ur.logger.Logger.Error("failed to get user",
 			"operation", "get user",
 			"user_id", userID.String(),
+			"error", err.Error(),
+		)
+
+		return nil, fmt.Errorf("select user: %w", err)
+	}
+
+	return &user, nil
+}
+
+func (ur *userRepository) GetByEmail(ctx context.Context, userEmail string) (*entity.User, error) {
+	sql, args, err := ur.qb.Builder.Select("id, name, email, password, created_at, updated_at").
+		From("users").Where(squirrel.Eq{"email": userEmail}).ToSql()
+	if err != nil {
+		ur.logger.Logger.Error("failed to build query for get user",
+			"operation", "get user",
+			"user_email", userEmail,
+			"error", err.Error(),
+		)
+
+		return nil, ErrFailBuildQuery
+	}
+
+	var user entity.User
+	if err := ur.db.DB.GetContext(ctx, &user, sql, args...); err != nil {
+		ur.logger.Logger.Error("failed to get user",
+			"operation", "get user",
+			"user_email", userEmail,
 			"error", err.Error(),
 		)
 
