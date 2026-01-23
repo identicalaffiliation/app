@@ -18,5 +18,5 @@ type UserUseCases interface {
 	ChangeName(ctx context.Context, changeNameRequest *dto.ChangeUserNameRequest) error
 	ChangeEmail(ctx context.Context, changeEmailRequest *dto.ChangeUserEmailRequest) error
 	ChangePassword(ctx context.Context, changePasswordRequest *dto.ChangeUserPasswordRequest) error
-	DeleteUser(ctx context.Context, userID uuid.UUID) error
+	// DeleteUser(ctx context.Context, userID uuid.UUID) error
 }

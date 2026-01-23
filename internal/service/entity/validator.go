@@ -24,3 +24,15 @@ func (v *Validator) UserRegisterRequestValidate(user *dto.UserRegisterRequest) e
 func (v *Validator) UserLoginRequestValidate(user *dto.UserLoginRequest) error {
 	return v.Validator.Struct(user)
 }
+
+func (v *Validator) UserChangeNameReguestValidate(userChangeReguest *dto.ChangeUserNameRequest) error {
+	return v.Validator.Struct(userChangeReguest)
+}
+
+func (v *Validator) UserChangeEmailRequestValidate(userChangeReguest *dto.ChangeUserEmailRequest) error {
+	return v.Validator.Struct(userChangeReguest)
+}
+
+func (v *Validator) UserChangePasswordRequestValidate(userChangeReguest *dto.ChangeUserPasswordRequest) error {
+	return v.Validator.Struct(userChangeReguest)
+}

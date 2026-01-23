@@ -35,7 +35,7 @@ func NewAuthService(ur psql.UserRepository, secret string) se.AuthUseCases {
 
 func (as *authService) Register(ctx context.Context, userRequest *dto.UserRegisterRequest) error {
 	if err := as.validator.UserRegisterRequestValidate(userRequest); err != nil {
-		return fmt.Errorf(se.ErrInvalidCreateUserRequest.Error(), err)
+		return err
 	}
 
 	uuid := uuid.New()
