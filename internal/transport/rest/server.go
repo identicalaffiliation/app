@@ -18,7 +18,7 @@ type httpServer struct {
 
 func NewHTTPServer(r *Router, cfg *config.AppConfig) HTTPController {
 	server := http.Server{
-		Addr:    cfg.HTTPServer.Port,
+		Addr:    ":" + cfg.HTTPServer.Port,
 		Handler: r.mux,
 	}
 
