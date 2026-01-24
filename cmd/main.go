@@ -4,6 +4,7 @@ import (
 	"github.com/identicalaffiliation/app/internal/config"
 	"github.com/identicalaffiliation/app/internal/logger"
 	"github.com/identicalaffiliation/app/internal/repository/psql"
+	"github.com/identicalaffiliation/app/internal/service"
 	"github.com/identicalaffiliation/app/pkg/parse"
 )
 
@@ -17,9 +18,9 @@ func main() {
 	db := psql.NewPostgres()
 	defer db.Close()
 
-	queryBuilder := psql.NewQueryBuilder()
 	db.MustInit(cfg)
 
-	_ = psql.NewUserRepository(db, queryBuilder, logger)
-	_ = psql.NewTodoRepository(db, queryBuilder, logger)
+	userRepo := psql.NewUserRepository(db, logger)
+	_ = service.NewUserService(userRepo)
+	_ = service.NewAuthService(userRepo, cfg.JWTSecret)
 }

@@ -24,11 +24,13 @@ type UserRepository interface {
 
 type userRepository struct {
 	db     *Postgres
-	qb     *Builder
+	qb     *builder
 	logger *logger.Logger
 }
 
-func NewUserRepository(db *Postgres, qb *Builder, logger *logger.Logger) UserRepository {
+func NewUserRepository(db *Postgres, logger *logger.Logger) UserRepository {
+	qb := NewQueryBuilder()
+
 	return &userRepository{
 		db:     db,
 		qb:     qb,

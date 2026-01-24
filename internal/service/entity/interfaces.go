@@ -18,5 +18,13 @@ type UserUseCases interface {
 	ChangeName(ctx context.Context, changeNameRequest *dto.ChangeUserNameRequest) error
 	ChangeEmail(ctx context.Context, changeEmailRequest *dto.ChangeUserEmailRequest) error
 	ChangePassword(ctx context.Context, changePasswordRequest *dto.ChangeUserPasswordRequest) error
-	// DeleteUser(ctx context.Context, userID uuid.UUID) error
+	DeleteUser(ctx context.Context, userID uuid.UUID) error
+}
+
+type TodoUseCases interface {
+	CreateTodo(ctx context.Context, todoRequest *dto.TodoCreateRequest) error
+	GetTodo(ctx context.Context, todoID uuid.UUID) (*dto.TodoResponse, error)
+	GetTodos(ctx context.Context) ([]*dto.TodoResponse, error)
+	ChangeContent(ctx context.Context, changeContentRequest *dto.TodoContentChangeRequest) error
+	ChangeStatus(ctx context.Context, changeStatusRequest *dto.TodoStatusChangeRequest) error
 }

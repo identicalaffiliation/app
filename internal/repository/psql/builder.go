@@ -2,12 +2,12 @@ package psql
 
 import "github.com/Masterminds/squirrel"
 
-type Builder struct {
+type builder struct {
 	Builder squirrel.StatementBuilderType
 }
 
-func NewQueryBuilder() *Builder {
-	return &Builder{
+func NewQueryBuilder() *builder {
+	return &builder{
 		Builder: squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar),
 	}
 }

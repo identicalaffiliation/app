@@ -22,11 +22,13 @@ type TodoRepository interface {
 
 type todoRepository struct {
 	db     *Postgres
-	qb     *Builder
+	qb     *builder
 	logger *logger.Logger
 }
 
-func NewTodoRepository(db *Postgres, qb *Builder, logger *logger.Logger) TodoRepository {
+func NewTodoRepository(db *Postgres, logger *logger.Logger) TodoRepository {
+	qb := NewQueryBuilder()
+
 	return &todoRepository{
 		db:     db,
 		qb:     qb,
@@ -205,7 +207,7 @@ func (tr *todoRepository) UpdateContent(ctx context.Context, newContent string, 
 	affected, err := result.RowsAffected()
 	if err != nil {
 		tr.logger.Logger.Error("failed to get affected from update todo content",
-			"operation", "update status",
+			"operation", "update content",
 			"user_id", userID.String(),
 			"todo_id", todoID.String(),
 			"req_content", newContent,
@@ -217,7 +219,7 @@ func (tr *todoRepository) UpdateContent(ctx context.Context, newContent string, 
 
 	if affected == 0 {
 		tr.logger.Logger.Error("failed to update todo status",
-			"operation", "update status",
+			"operation", "update content",
 			"user_id", userID.String(),
 			"todo_id", todoID.String(),
 			"req_content", newContent,
@@ -235,7 +237,7 @@ func (tr *todoRepository) Delete(ctx context.Context, todoID, userID uuid.UUID) 
 		Where(squirrel.Eq{"user_id": userID}).ToSql()
 	if err != nil {
 		tr.logger.Logger.Error("failed to build query for delete todo",
-			"operation", "delete content",
+			"operation", "delete todo",
 			"user_id", userID.String(),
 			"todo_id", todoID.String(),
 			"error", err.Error(),
@@ -247,7 +249,7 @@ func (tr *todoRepository) Delete(ctx context.Context, todoID, userID uuid.UUID) 
 	result, err := tr.db.DB.ExecContext(ctx, sql, args...)
 	if err != nil {
 		tr.logger.Logger.Error("failed to delete todo",
-			"operation", "delete content",
+			"operation", "delete todo",
 			"user_id", userID.String(),
 			"todo_id", todoID.String(),
 			"error", err.Error(),

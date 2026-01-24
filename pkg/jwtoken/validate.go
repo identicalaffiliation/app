@@ -8,7 +8,8 @@ import (
 )
 
 type TokenValidator interface {
-	ValidateToken(tokenString string) error
+	ValidateTokenWithClaims(tokenString string) (jwt.MapClaims, error)
+	ValidateClaims(claims jwt.MapClaims) error
 }
 
 type tokenValidator struct{ secretKey []byte }
@@ -17,7 +18,7 @@ func NewTokenValidator(secret string) TokenValidator {
 	return &tokenValidator{secretKey: []byte(secret)}
 }
 
-func (tv *tokenValidator) ValidateToken(tokenString string) error {
+func (tv *tokenValidator) ValidateTokenWithClaims(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("signing method: %v", t.Header["alg"])
@@ -26,11 +27,28 @@ func (tv *tokenValidator) ValidateToken(tokenString string) error {
 		return tv.secretKey, nil
 	})
 	if err != nil {
-		return fmt.Errorf("parse token: %w", err)
+		return nil, fmt.Errorf("parse token: %w", err)
 	}
 
 	if !token.Valid {
-		return errors.New("invalid token")
+		return nil, errors.New("invalid token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, errors.New("invalid token claims")
+	}
+
+	return claims, nil
+}
+
+func (tv *tokenValidator) ValidateClaims(claims jwt.MapClaims) error {
+	if _, ok := claims["userID"]; !ok {
+		return errors.New("token hasn't userID")
+	}
+
+	if _, ok := claims["email"]; !ok {
+		return errors.New("token hasn't email")
 	}
 
 	return nil
