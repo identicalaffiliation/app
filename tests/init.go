@@ -10,20 +10,18 @@ import (
 
 func InitUser(db *sql.DB) psql.UserRepository {
 	sqlxDB := sqlx.NewDb(db, "postgres")
-	qb := psql.NewQueryBuilder()
 	postgres := psql.NewPostgres()
 	postgres.DB = sqlxDB
-	repo := psql.NewUserRepository(postgres, qb, logger.NewLogger())
+	repo := psql.NewUserRepository(postgres, logger.NewLogger())
 
 	return repo
 }
 
 func InitTodo(db *sql.DB) psql.TodoRepository {
 	sqlxDB := sqlx.NewDb(db, "postgres")
-	qb := psql.NewQueryBuilder()
 	postgres := psql.NewPostgres()
 	postgres.DB = sqlxDB
-	repo := psql.NewTodoRepository(postgres, qb, logger.NewLogger())
+	repo := psql.NewTodoRepository(postgres, logger.NewLogger())
 
 	return repo
 }

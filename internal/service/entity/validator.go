@@ -36,3 +36,23 @@ func (v *Validator) UserChangeEmailRequestValidate(userChangeReguest *dto.Change
 func (v *Validator) UserChangePasswordRequestValidate(userChangeReguest *dto.ChangeUserPasswordRequest) error {
 	return v.Validator.Struct(userChangeReguest)
 }
+
+func (v *Validator) TodoCreateRequestValidate(todoRequest *dto.TodoCreateRequest) error {
+	if todoRequest.Status == "done" {
+		return ErrInvalidTodoStatus
+	}
+
+	if todoRequest.Status == "" {
+		todoRequest.Status = "todo"
+	}
+
+	return v.Validator.Struct(todoRequest)
+}
+
+func (v *Validator) TodoContentChangeRequest(todoChangeRequest *dto.TodoContentChangeRequest) error {
+	return v.Validator.Struct(todoChangeRequest)
+}
+
+func (v *Validator) TodoStatusChangeRequest(todoChangeRequest *dto.TodoStatusChangeRequest) error {
+	return v.Validator.Struct(todoChangeRequest)
+}

@@ -28,6 +28,7 @@ type HTTPConfig struct {
 type AppConfig struct {
 	Database   PostgresConfig
 	HTTPServer HTTPConfig `yaml:"http"`
+	JWTSecret  string     `env:"JWT_SECRET"`
 }
 
 func MustLoadConfig(path string) *AppConfig {

@@ -205,6 +205,62 @@ func TestGetByID(t *testing.T) {
 	}
 }
 
+func TestGetByEmail(t *testing.T) {
+	type testCase struct {
+		testName     string
+		mockSetup    func(mock sqlmock.Sqlmock, email string)
+		inputEmail   string
+		expectedUser *entity.User
+	}
+
+	testEmail := "123@mail.ru"
+	ID := uuid.New()
+	tt := time.Now()
+	testTable := []testCase{
+		{
+			testName: "success – user found",
+			mockSetup: func(mock sqlmock.Sqlmock, email string) {
+				rows := sqlmock.NewRows([]string{"id", "name", "email", "password", "created_at", "updated_at"}).
+					AddRow(ID, "vlad", email, "123123", tt, tt)
+
+				mock.ExpectQuery(regexp.QuoteMeta(USER_GET_BY_EMAIL)).WithArgs(email).WillReturnRows(rows)
+			},
+			inputEmail: testEmail,
+			expectedUser: &entity.User{
+				ID:        ID,
+				Name:      "vlad",
+				Email:     testEmail,
+				Password:  "123123",
+				CreatedAt: tt,
+				UpdatedAt: tt,
+			},
+		},
+	}
+
+	for _, tc := range testTable {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			db, mock, err := sqlmock.New()
+			require.NoError(t, err)
+			defer db.Close()
+
+			repo := InitUser(db)
+
+			tc.mockSetup(mock, tc.inputEmail)
+
+			res, err := repo.GetByEmail(context.Background(), tc.inputEmail)
+			require.NoError(t, err)
+
+			assert.NotNil(t, res)
+			assert.Equal(t, tc.expectedUser.Email, res.Email)
+			assert.Equal(t, tc.expectedUser.ID, res.ID)
+
+			require.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
 func TestChangeName(t *testing.T) {
 	type testCase struct {
 		testName      string

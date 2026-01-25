@@ -17,7 +17,7 @@ type ChangeUserEmailRequest struct {
 type ChangeUserPasswordRequest struct {
 	ID          uuid.UUID `validate:"required"`
 	OldPassword string    `json:"oldPassword" validate:"required,min=8"`
-	NewPassword string    `json:"NewPassword" validate:"required,min=8"`
+	NewPassword string    `json:"newPassword" validate:"required,min=8"`
 }
 
 type UserResponse struct {
