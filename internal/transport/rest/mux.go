@@ -23,6 +23,9 @@ func NewRouter(cfg *config.AppConfig, ah AuthHandler, uh UserHandler) *Router {
 		r.Use(authMiddleware(tokenValidator))
 
 		r.Get("/api/users/me", uh.MyProfile)
+		r.Patch("/api/users/me/name", uh.ChangeMyName)
+		r.Patch("/api/users/me/email", uh.ChangeMyEmail)
+		r.Patch("/api/users/me/password", uh.ChangeMyPassword)
 	})
 
 	mux.Group(func(r chi.Router) {

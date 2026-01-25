@@ -11,4 +11,7 @@ type AuthHandler interface {
 
 type UserHandler interface {
 	MyProfile(w http.ResponseWriter, r *http.Request)
+	ChangeMyName(w http.ResponseWriter, r *http.Request)
+	ChangeMyEmail(w http.ResponseWriter, r *http.Request)
+	ChangeMyPassword(w http.ResponseWriter, r *http.Request)
 }
