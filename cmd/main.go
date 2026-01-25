@@ -29,12 +29,15 @@ func main() {
 	db.MustInit(cfg)
 
 	userRepo := psql.NewUserRepository(db, logger)
+	todoRepo := psql.NewTodoRepository(db, logger)
 	userSerivce := service.NewUserService(userRepo)
+	todoService := service.NewTodoService(userRepo, todoRepo)
 	authService := service.NewAuthService(userRepo, cfg.JWTSecret)
 	authHandler := rest.NewAuthHandler(authService)
 	userHandler := rest.NewUserHandler(userSerivce)
+	todoHandler := rest.NewTodoHandler(todoService)
 
-	r := rest.NewRouter(cfg, authHandler, userHandler)
+	r := rest.NewRouter(cfg, authHandler, userHandler, todoHandler)
 	s := rest.NewHTTPServer(r, cfg)
 
 	go func() {

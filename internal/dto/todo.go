@@ -26,6 +26,6 @@ type (
 
 	TodoStatusChangeRequest struct {
 		TodoID    uuid.UUID `json:"todoID" validate:"required"`
-		NewStatus string    `json:"status" validate:"required"`
+		NewStatus string    `json:"status" validate:"required,oneof=todo process done"`
 	}
 )

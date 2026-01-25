@@ -28,7 +28,7 @@ func NewTodoService(ur psql.UserRepository, tr psql.TodoRepository) se.TodoUseCa
 }
 
 func (ts *todoService) CreateTodo(ctx context.Context, todoRequest *dto.TodoCreateRequest) error {
-	var userID uuid.UUID = ctx.Value("userID").(uuid.UUID)
+	userID, _ := uuid.Parse(ctx.Value("userID").(string))
 	if userID == uuid.Nil {
 		return se.ErrInvalidUserID
 	}
@@ -50,7 +50,7 @@ func (ts *todoService) CreateTodo(ctx context.Context, todoRequest *dto.TodoCrea
 }
 
 func (ts *todoService) GetTodo(ctx context.Context, todoID uuid.UUID) (*dto.TodoResponse, error) {
-	var userID uuid.UUID = ctx.Value("userID").(uuid.UUID)
+	userID, _ := uuid.Parse(ctx.Value("userID").(string))
 	if userID == uuid.Nil {
 		return nil, se.ErrInvalidUserID
 	}
@@ -73,7 +73,7 @@ func (ts *todoService) GetTodo(ctx context.Context, todoID uuid.UUID) (*dto.Todo
 }
 
 func (ts *todoService) GetTodos(ctx context.Context) ([]*dto.TodoResponse, error) {
-	var userID uuid.UUID = ctx.Value("userID").(uuid.UUID)
+	userID, _ := uuid.Parse(ctx.Value("userID").(string))
 	if userID == uuid.Nil {
 		return nil, se.ErrInvalidUserID
 	}
@@ -103,7 +103,7 @@ func (ts *todoService) todosToResponse(todos []*re.Todo) []*dto.TodoResponse {
 }
 
 func (ts *todoService) ChangeContent(ctx context.Context, changeContentRequest *dto.TodoContentChangeRequest) error {
-	var userID uuid.UUID = ctx.Value("userID").(uuid.UUID)
+	userID, _ := uuid.Parse(ctx.Value("userID").(string))
 	if userID == uuid.Nil {
 		return se.ErrInvalidUserID
 	}
@@ -120,7 +120,7 @@ func (ts *todoService) ChangeContent(ctx context.Context, changeContentRequest *
 }
 
 func (ts *todoService) ChangeStatus(ctx context.Context, changeStatusRequest *dto.TodoStatusChangeRequest) error {
-	var userID uuid.UUID = ctx.Value("userID").(uuid.UUID)
+	userID, _ := uuid.Parse(ctx.Value("userID").(string))
 	if userID == uuid.Nil {
 		return se.ErrInvalidUserID
 	}
@@ -137,7 +137,7 @@ func (ts *todoService) ChangeStatus(ctx context.Context, changeStatusRequest *dt
 }
 
 func (ts *todoService) DeleteTodo(ctx context.Context, todoID uuid.UUID) error {
-	var userID uuid.UUID = ctx.Value("userID").(uuid.UUID)
+	userID, _ := uuid.Parse(ctx.Value("userID").(string))
 	if userID == uuid.Nil {
 		return se.ErrInvalidUserID
 	}

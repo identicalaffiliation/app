@@ -185,3 +185,26 @@ func (th *todoHandler) ChangeTodoStatus(w http.ResponseWriter, r *http.Request) 
 
 	th.nw.Response(w)
 }
+
+func (th *todoHandler) DeleteTodo(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		th.nw.ErrorResponse(w, ErrInvalidMethod, http.StatusMethodNotAllowed)
+
+		return
+	}
+
+	todoID, err := uuid.Parse(r.PathValue("todoID"))
+	if err != nil {
+		th.nw.ErrorResponse(w, err, http.StatusBadRequest)
+
+		return
+	}
+
+	if err := th.todoService.DeleteTodo(r.Context(), todoID); err != nil {
+		th.nw.ErrorResponse(w, err, http.StatusBadRequest)
+
+		return
+	}
+
+	th.nw.Response(w)
+}
