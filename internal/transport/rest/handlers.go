@@ -15,3 +15,12 @@ type UserHandler interface {
 	ChangeMyEmail(w http.ResponseWriter, r *http.Request)
 	ChangeMyPassword(w http.ResponseWriter, r *http.Request)
 }
+
+type TodoHandler interface {
+	NewTodo(w http.ResponseWriter, r *http.Request)
+	MyTodo(w http.ResponseWriter, r *http.Request)
+	MyTodos(w http.ResponseWriter, r *http.Request)
+	ChangeTodoContent(w http.ResponseWriter, r *http.Request)
+	ChangeTodoStatus(w http.ResponseWriter, r *http.Request)
+	DeleteTodo(w http.ResponseWriter, r *http.Request)
+}
