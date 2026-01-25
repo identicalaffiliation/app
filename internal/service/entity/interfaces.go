@@ -27,4 +27,5 @@ type TodoUseCases interface {
 	GetTodos(ctx context.Context) ([]*dto.TodoResponse, error)
 	ChangeContent(ctx context.Context, changeContentRequest *dto.TodoContentChangeRequest) error
 	ChangeStatus(ctx context.Context, changeStatusRequest *dto.TodoStatusChangeRequest) error
+	DeleteTodo(ctx context.Context, todoID uuid.UUID) error
 }

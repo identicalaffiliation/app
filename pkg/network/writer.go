@@ -10,6 +10,7 @@ type NetworkWriter interface {
 	UserFoundResponse(w http.ResponseWriter, userData []byte)
 	Response(w http.ResponseWriter)
 	AuthResponse(w http.ResponseWriter, authData []byte)
+	TodoFoundResponse(w http.ResponseWriter, todoData []byte)
 }
 
 type networkWriter struct{}
@@ -42,4 +43,10 @@ func (nw *networkWriter) AuthResponse(w http.ResponseWriter, authData []byte) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(authData)
+}
+
+func (nw *networkWriter) TodoFoundResponse(w http.ResponseWriter, todoData []byte) {
+	w.WriteHeader(http.StatusFound)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(todoData)
 }
